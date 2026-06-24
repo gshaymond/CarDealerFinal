@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Home - Turbo Car Deals</title>
-</head>
+<%- include('partials/header', { title: title || 'Home', user }) %>
+<h1>Welcome to Turbo Car Deals</h1>
+<p>Find your perfect car today.</p>
 
-<body>
-    <% include('partials/header', { title: 'Home', user }) %>
-    <h1>Welcome to Turbo Car Deals</h1>
-    <p>Find your perfect car today.</p>
-    
-    <% if (user) { %>
-        <p>Welcome back, <%= user.email %>!</p>
-    <% } else { %>
-        <p><a href="/auth/register">Register</a> or <a href="/auth/login">Login</a> to get started.</p>
-    <% } %>
-    <% include('partials/footer') %>
-</body>
-</html>
+<% if (user) { %>
+    <p>Welcome back, <%= user.email %>!</p>
+<% } else { %>
+    <p><a href="/auth/register">Register</a> or <a href="/auth/login">Login</a> to get started.</p>
+<% } %>
+
+<%- include('partials/footer') %>

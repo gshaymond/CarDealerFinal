@@ -18,6 +18,10 @@ app.set('views', 'src/views');
 
 // Session middleware
 app.use(session(sessionConfig));
+app.use((req, res, next) => {
+  res.locals.user = req.session?.user || null;
+  next();
+});
 
 // Routes
 app.use('/', indexRoutes);
@@ -26,7 +30,7 @@ app.use('/auth', authRoutes);
 // Error handler (basic)
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).render('error', { error: 'Something went wrong' });
+  res.status(err.status || 500).render('error', { message: 'Something went wrong' });
 });
 
 app.listen(PORT, () => {

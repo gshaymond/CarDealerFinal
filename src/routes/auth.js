@@ -1,28 +1,18 @@
 import express from 'express';
+import {
+  getLogin,
+  getRegister,
+  login,
+  logout,
+  register,
+} from '../controllers/authController.js';
 
 const router = express.Router();
 
-router.get('/register', (req, res) => {
-  res.render('register');
-});
-
-router.post('/register', (req, res) => {
-  // To be implemented
-  res.send('Register logic coming soon');
-});
-
-router.get('/login', (req, res) => {
-  res.render('login');
-});
-
-router.post('/login', (req, res) => {
-  // To be implemented
-  res.send('Login logic coming soon');
-});
-
-router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
-});
+router.get('/register', getRegister);
+router.post('/register', register);
+router.get('/login', getLogin);
+router.post('/login', login);
+router.get('/logout', logout);
 
 export default router;

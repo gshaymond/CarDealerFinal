@@ -1,0 +1,5 @@
+<%- include('partials/header', { title: title || 'Dashboard', user }) %>
+<h1><%= title || 'Dashboard' %></h1>
+<p>You are signed in as <%= user.email %> (<%= user.role %>).</p>
+
+<%- include('partials/footer') %>
