@@ -1,3 +1,4 @@
+// Middleware to check if the user is authenticated and has the required role(s)
 export function requireAuth(req, res, next) {
 	if (req.session?.user) {
 		return next();
@@ -6,6 +7,7 @@ export function requireAuth(req, res, next) {
 	return res.redirect('/auth/login');
 }
 
+// Middleware to check if the user has one of the allowed roles
 export function requireRole(...allowedRoles) {
 	return (req, res, next) => {
 		const role = req.session?.user?.role;

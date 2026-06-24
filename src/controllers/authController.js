@@ -1,18 +1,26 @@
 import bcrypt from 'bcrypt';
 import pool from '../db.js';
 
+// Helper function to render forms with error messages and form values
 function renderForm(res, view, values) {
 	return res.render(view, values);
 }
 
+// GET /auth/register
+// GET /auth/login
+// POST /auth/register
+// POST /auth/login
+// GET /auth/logout
 export function getRegister(req, res) {
 	renderForm(res, 'register', { title: 'Register', error: null, form: {} });
 }
 
+// GET /auth/login
 export function getLogin(req, res) {
 	renderForm(res, 'login', { title: 'Login', error: null, form: {} });
 }
 
+// POST /auth/register
 export async function register(req, res, next) {
 	try {
 		const displayName = (req.body.displayName || '').trim();
@@ -64,6 +72,7 @@ export async function register(req, res, next) {
 	}
 }
 
+// POST /auth/login
 export async function login(req, res, next) {
 	try {
 		const email = (req.body.email || '').trim().toLowerCase();
@@ -109,6 +118,7 @@ export async function login(req, res, next) {
 	}
 }
 
+// GET /auth/logout
 export function logout(req, res, next) {
 	req.session.destroy((error) => {
 		if (error) {

@@ -7,6 +7,7 @@ import {
   register,
 } from '../controllers/authController.js';
 
+// Create a router for authentication routes
 const router = express.Router();
 
 router.get('/register', getRegister);
