@@ -1,6 +1,6 @@
 // Session configuration for express-session
 export const sessionConfig = {
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'development-session-secret',
     resave: false,
     saveUninitialized: false,
     cookie: {

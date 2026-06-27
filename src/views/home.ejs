@@ -1,6 +1,7 @@
 <%- include('partials/header', { title: title || 'Home', user }) %>
 <h1>Welcome to Turbo Car Deals</h1>
 <p>Find your perfect car today.</p>
+<p><a href="/vehicles">Browse inventory</a></p>
 
 <% if (user) { %>
     <p>Welcome back, <%= user.email %>!</p>

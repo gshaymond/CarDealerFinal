@@ -1,5 +1,6 @@
 import express from 'express';
 import { requireAuth, requireRole } from '../middleware/auth.js';
+import { getInventory, getVehicle } from '../controllers/vehicleController.js';
 
 const router = express.Router();
 
@@ -7,6 +8,12 @@ const router = express.Router();
 router.get('/', (req, res) => {
   res.render('home', { title: 'Home' });
 });
+
+// GET /vehicles - Inventory page
+router.get('/vehicles', getInventory);
+
+// GET /vehicle/:id and /vehicles/:id - Vehicle detail page
+router.get(['/vehicle/:id', '/vehicles/:id'], getVehicle);
 
 // GET /dashboard - Dashboard page (requires authentication)
 router.get('/dashboard', requireAuth, (req, res) => {

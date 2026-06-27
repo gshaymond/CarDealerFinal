@@ -1,0 +1,39 @@
+<%- include('../partials/header', { title: title || 'Vehicle Details', user }) %>
+
+<% if (!found) { %>
+  <h1>Vehicle Details</h1>
+  <p><%= message || 'That vehicle could not be found.' %></p>
+  <p><a href="/vehicles">Back to inventory</a></p>
+<% } else { %>
+  <article>
+    <h1><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></h1>
+    <p>
+      <strong>Category:</strong> <%= vehicle.category_name || 'Uncategorized' %><br>
+      <strong>Price:</strong> $<%= Number(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %><br>
+      <strong>Mileage:</strong> <%= Number(vehicle.mileage).toLocaleString('en-US') %> miles<br>
+      <strong>Status:</strong> <%= vehicle.is_available ? 'Available' : 'Sold' %>
+    </p>
+
+    <% if (images.length > 0) { %>
+      <section>
+        <h2>Photos</h2>
+        <% images.forEach((image) => { %>
+          <figure>
+            <img src="<%= image.image_url %>" alt="<%= image.alt_text || `${vehicle.year} ${vehicle.make} ${vehicle.model}` %>" width="480">
+          </figure>
+        <% }) %>
+      </section>
+    <% } else { %>
+      <p>No photos have been uploaded yet.</p>
+    <% } %>
+
+    <section>
+      <h2>Description</h2>
+      <p><%= vehicle.description || 'No description has been added yet.' %></p>
+    </section>
+
+    <p><a href="/vehicles">Back to inventory</a></p>
+  </article>
+<% } %>
+
+<%- include('../partials/footer') %>

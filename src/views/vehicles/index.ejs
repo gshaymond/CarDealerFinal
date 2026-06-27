@@ -1,0 +1,28 @@
+<%- include('../partials/header', { title: title || 'Inventory', user }) %>
+<h1>Inventory</h1>
+<p>Browse the vehicles we have available. This page is ready for database records and shows a clean empty state until inventory is added.</p>
+
+<% if (vehicles.length === 0) { %>
+  <section>
+    <h2>No vehicles yet</h2>
+    <p>Inventory will appear here once your database is connected and seeded.</p>
+    <p><a href="/">Return home</a></p>
+  </section>
+<% } else { %>
+  <section>
+    <% vehicles.forEach((vehicle) => { %>
+      <article>
+        <h2><a href="/vehicles/<%= vehicle.id %>"><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></a></h2>
+        <p>
+          <strong>Category:</strong> <%= vehicle.category_name || 'Uncategorized' %><br>
+          <strong>Price:</strong> $<%= Number(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %><br>
+          <strong>Mileage:</strong> <%= Number(vehicle.mileage).toLocaleString('en-US') %> miles<br>
+          <strong>Status:</strong> <%= vehicle.is_available ? 'Available' : 'Sold' %>
+        </p>
+        <p><%= vehicle.description || 'No description has been added yet.' %></p>
+      </article>
+    <% }) %>
+  </section>
+<% } %>
+
+<%- include('../partials/footer') %>
