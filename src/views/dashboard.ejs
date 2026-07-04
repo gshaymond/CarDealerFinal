@@ -1,5 +1,69 @@
 <%- include('partials/header', { title: title || 'Dashboard', user }) %>
 <h1><%= title || 'Dashboard' %></h1>
+
+<% if (notice) { %>
+	<p><%= notice %></p>
+<% } %>
+
 <p>You are signed in as <%= user.email %> (<%= user.role %>).</p>
+
+<section>
+	<h2>My Service Requests</h2>
+
+	<% if (!serviceRequests || serviceRequests.length === 0) { %>
+		<p>You have not submitted any service requests yet.</p>
+	<% } else { %>
+		<% serviceRequests.forEach((serviceRequest) => { %>
+			<article>
+				<h3>
+					<% if (serviceRequest.vehicle_id) { %>
+						<a href="/vehicles/<%= serviceRequest.vehicle_id %>"><%= serviceRequest.year %> <%= serviceRequest.make %> <%= serviceRequest.model %></a>
+					<% } else { %>
+						Vehicle removed
+					<% } %>
+				</h3>
+				<p><strong>Service type:</strong> <%= serviceRequest.service_type %></p>
+				<p><strong>Status:</strong> <%= serviceRequest.status %></p>
+				<p><strong>Submitted:</strong> <%= new Date(serviceRequest.created_at).toLocaleString() %></p>
+				<p><%= serviceRequest.notes %></p>
+
+				<% if (serviceRequest.history.length > 0) { %>
+					<h4>History</h4>
+					<ul>
+						<% serviceRequest.history.forEach((entry) => { %>
+							<li>
+								<strong><%= entry.status %></strong> - <%= new Date(entry.created_at).toLocaleString() %>
+								<% if (entry.note) { %>
+									<span><%= entry.note %></span>
+								<% } %>
+							</li>
+						<% }) %>
+					</ul>
+				<% } %>
+			</article>
+		<% }) %>
+	<% } %>
+</section>
+
+<section>
+	<h2>My Reviews</h2>
+
+	<% if (!reviews || reviews.length === 0) { %>
+		<p>You have not posted any reviews yet.</p>
+	<% } else { %>
+		<ul>
+			<% reviews.forEach((review) => { %>
+				<li>
+					<% if (review.year) { %>
+						<a href="/vehicles/<%= review.vehicle_id %>"><%= review.year %> <%= review.make %> <%= review.model %></a>
+					<% } %>
+					- <%= review.rating %>/5
+					- <%= review.status %>
+					- <%= new Date(review.created_at).toLocaleDateString() %>
+				</li>
+			<% }) %>
+		</ul>
+	<% } %>
+</section>
 
 <%- include('partials/footer') %>

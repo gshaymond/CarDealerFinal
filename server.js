@@ -21,6 +21,12 @@ app.use(session(sessionConfig));
 app.use((req, res, next) => {
   res.locals.user = req.session?.user || null;
   res.locals.title = 'Turbo Car Deals';
+  res.locals.notice = req.session?.notice || null;
+
+  if (req.session) {
+    req.session.notice = null;
+  }
+
   next();
 });
 

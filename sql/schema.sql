@@ -43,8 +43,9 @@ CREATE TABLE reviews (
   vehicle_id INTEGER NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
   rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  status TEXT NOT NULL DEFAULT 'Pending',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, vehicle_id)
 );
 
 CREATE TABLE service_requests (
@@ -53,7 +54,7 @@ CREATE TABLE service_requests (
   vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE SET NULL,
   service_type TEXT NOT NULL,
   notes TEXT NOT NULL DEFAULT '',
-  status TEXT NOT NULL DEFAULT 'submitted',
+  status TEXT NOT NULL DEFAULT 'Submitted',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

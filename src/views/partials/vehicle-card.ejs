@@ -1,0 +1,35 @@
+<article class="vehicle-card">
+  <% if (thumbnailUrl) { %>
+    <figure>
+      <img src="<%= thumbnailUrl %>" alt="<%= vehicle.alt_text || `${vehicle.year} ${vehicle.make} ${vehicle.model}` %>" width="320">
+    </figure>
+  <% } %>
+
+  <header>
+    <h2>
+      <% if (linkToDetails) { %>
+        <a href="/vehicles/<%= vehicle.id %>"><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></a>
+      <% } else { %>
+        <%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %>
+      <% } %>
+    </h2>
+  </header>
+
+  <dl>
+    <dt>Category</dt>
+    <dd><%= vehicle.category_name || 'Uncategorized' %></dd>
+
+    <dt>Price</dt>
+    <dd>$<%= Number(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></dd>
+
+    <dt>Mileage</dt>
+    <dd><%= Number(vehicle.mileage).toLocaleString('en-US') %> miles</dd>
+
+    <dt>Status</dt>
+    <dd><%= vehicle.is_available ? 'Available' : 'Sold' %></dd>
+  </dl>
+
+  <% if (showDescription) { %>
+    <p><%= vehicle.description || 'No description has been added yet.' %></p>
+  <% } %>
+</article>

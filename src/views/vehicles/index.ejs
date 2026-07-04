@@ -9,18 +9,9 @@
     <p><a href="/">Return home</a></p>
   </section>
 <% } else { %>
-  <section>
+  <section aria-label="Vehicle inventory">
     <% vehicles.forEach((vehicle) => { %>
-      <article>
-        <h2><a href="/vehicles/<%= vehicle.id %>"><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></a></h2>
-        <p>
-          <strong>Category:</strong> <%= vehicle.category_name || 'Uncategorized' %><br>
-          <strong>Price:</strong> $<%= Number(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %><br>
-          <strong>Mileage:</strong> <%= Number(vehicle.mileage).toLocaleString('en-US') %> miles<br>
-          <strong>Status:</strong> <%= vehicle.is_available ? 'Available' : 'Sold' %>
-        </p>
-        <p><%= vehicle.description || 'No description has been added yet.' %></p>
-      </article>
+      <%- include('../partials/vehicle-card', { vehicle, linkToDetails: true, showDescription: true, thumbnailUrl: vehicle.image_url }) %>
     <% }) %>
   </section>
 <% } %>
