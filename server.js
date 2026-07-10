@@ -9,6 +9,12 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (isProduction) {
+  // Required behind Render's reverse proxy for secure cookies.
+  app.set('trust proxy', 1);
+}
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -37,7 +43,12 @@ app.use('/auth', authRoutes);
 
 // Error handler (basic)
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Unhandled request error', {
+    path: req.path,
+    method: req.method,
+    message: err.message,
+    code: err.code,
+  });
   res.status(err.status || 500).render('error', { message: 'Something went wrong' });
 });
 
