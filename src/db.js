@@ -6,9 +6,22 @@ const { Pool } = pg;
 const isProduction = process.env.NODE_ENV === 'production';
 
 const connectionString = process.env.DATABASE_URL || process.env.DB_URL;
+const discreteConfig = {
+    host: process.env.DB_HOST,
+    port: Number.parseInt(process.env.DB_PORT || '5432', 10),
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+};
+const hasDiscreteConfig = Boolean(
+    discreteConfig.host && discreteConfig.database && discreteConfig.user && discreteConfig.password
+);
+const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes((discreteConfig.host || '').toLowerCase());
 
-if (isProduction && !connectionString) {
-    throw new Error('Missing DATABASE_URL (or DB_URL) in production. Refusing to fall back to localhost DB settings.');
+if (isProduction && !connectionString && (!hasDiscreteConfig || isLocalHost)) {
+    throw new Error(
+        'Production database configuration is missing. Set DATABASE_URL in Render (recommended) or provide non-local DB_HOST/DB_NAME/DB_USER/DB_PASSWORD.'
+    );
 }
 
 function describeConnectionTarget(urlString) {
@@ -29,13 +42,7 @@ const poolConfig = connectionString
           connectionString,
           ssl: { rejectUnauthorized: false },
       }
-    : {
-          host: process.env.DB_HOST,
-          port: Number.parseInt(process.env.DB_PORT || '5432', 10),
-          database: process.env.DB_NAME,
-          user: process.env.DB_USER,
-          password: process.env.DB_PASSWORD,
-      };
+    : discreteConfig;
 
 const pool = new Pool(poolConfig);
 
