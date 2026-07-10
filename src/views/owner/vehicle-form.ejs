@@ -1,0 +1,110 @@
+<%- include('../partials/header', { title: title || 'Vehicle Form', user }) %>
+
+<h1><%= title || 'Vehicle Form' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<section>
+	<h2><%= mode === 'edit' ? 'Edit Vehicle' : 'Add Vehicle' %></h2>
+	<% if (error) { %>
+		<p class="error-message"><%= error %></p>
+	<% } %>
+	<form method="POST" action="<%= mode === 'edit' ? `/owner/vehicles/${vehicle.id}` : '/owner/vehicles' %>">
+		<label>
+			<span>Year</span>
+			<input type="number" name="year" value="<%= form.year || '' %>" min="1886" max="2100" required>
+		</label>
+		<label>
+			<span>Make</span>
+			<input type="text" name="make" value="<%= form.make || '' %>" required>
+		</label>
+		<label>
+			<span>Model</span>
+			<input type="text" name="model" value="<%= form.model || '' %>" required>
+		</label>
+		<label>
+			<span>Mileage</span>
+			<input type="number" name="mileage" value="<%= form.mileage || 0 %>" min="0" required>
+		</label>
+		<label>
+			<span>Price</span>
+			<input type="number" name="price" value="<%= form.price || '' %>" min="0" step="0.01" required>
+		</label>
+		<label>
+			<span>Category</span>
+			<select name="categoryId">
+				<option value="">Uncategorized</option>
+				<% categories.forEach((category) => { %>
+					<option value="<%= category.id %>" <%= String(form.categoryId) === String(category.id) ? 'selected' : '' %>><%= category.name %></option>
+				<% }) %>
+			</select>
+		</label>
+		<label>
+			<span>Description</span>
+			<textarea name="description" required><%= form.description || '' %></textarea>
+		</label>
+		<label>
+			<span>Available</span>
+			<select name="isAvailable">
+				<option value="true" <%= form.isAvailable ? 'selected' : '' %>>Available</option>
+				<option value="false" <%= !form.isAvailable ? 'selected' : '' %>>Sold</option>
+			</select>
+		</label>
+		<% if (mode === 'create') { %>
+			<label>
+				<span>First image URL</span>
+				<input type="url" name="imageUrl" value="<%= form.imageUrl || '' %>">
+			</label>
+			<label>
+				<span>Image alt text</span>
+				<input type="text" name="imageAltText" value="<%= form.imageAltText || '' %>">
+			</label>
+		<% } %>
+		<button type="submit"><%= mode === 'edit' ? 'Save Vehicle' : 'Create Vehicle' %></button>
+	</form>
+</section>
+
+<% if (mode === 'edit') { %>
+<section>
+	<h2>Vehicle Images</h2>
+	<% if (!images || images.length === 0) { %>
+		<p class="empty-state">No images have been added yet.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% images.forEach((image) => { %>
+				<article>
+					<figure>
+						<img src="<%= image.image_url %>" alt="<%= image.alt_text || 'Vehicle image' %>">
+					</figure>
+					<p><%= image.alt_text || 'No alt text provided.' %></p>
+					<form method="POST" action="/owner/vehicle-images/<%= image.id %>/delete">
+						<button type="submit">Delete Image</button>
+					</form>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+
+	<h3>Add Another Image</h3>
+	<form class="inline-form" method="POST" action="/owner/vehicles/<%= vehicle.id %>/images">
+		<label>
+			<span class="muted">Image URL</span>
+			<input type="url" name="imageUrl" value="<%= form.imageUrl || '' %>">
+		</label>
+		<label>
+			<span class="muted">Alt text</span>
+			<input type="text" name="altText" value="<%= form.imageAltText || '' %>">
+		</label>
+		<button type="submit">Add Image</button>
+	</form>
+
+	<h3>Delete Vehicle</h3>
+	<form method="POST" action="/owner/vehicles/<%= vehicle.id %>/delete" onsubmit="return confirm('Delete this vehicle? This will remove related reviews and images.');">
+		<button type="submit">Delete Vehicle</button>
+	</form>
+</section>
+<% } %>
+
+<%- include('../partials/footer') %>

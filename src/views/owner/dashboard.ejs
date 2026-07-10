@@ -1,0 +1,147 @@
+<%- include('../partials/header', { title: title || 'Owner Dashboard', user }) %>
+
+<h1><%= title || 'Owner Dashboard' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<section>
+	<h2>System Overview</h2>
+	<div class="summary-grid">
+		<div class="summary-card"><span>Total users</span><strong><%= summary.total_users %></strong></div>
+		<div class="summary-card"><span>Total vehicles</span><strong><%= summary.total_vehicles %></strong></div>
+		<div class="summary-card"><span>Categories</span><strong><%= summary.total_categories %></strong></div>
+		<div class="summary-card"><span>Vehicle images</span><strong><%= summary.total_vehicle_images %></strong></div>
+		<div class="summary-card"><span>Reviews</span><strong><%= summary.total_reviews %></strong></div>
+		<div class="summary-card"><span>Service requests</span><strong><%= summary.total_service_requests %></strong></div>
+		<div class="summary-card"><span>Contact messages</span><strong><%= summary.total_contact_messages %></strong></div>
+		<div class="summary-card"><span>Open requests</span><strong><%= summary.open_service_requests %></strong></div>
+	</div>
+</section>
+
+<section>
+	<h2>Admin Navigation</h2>
+	<div class="stack-actions">
+		<a href="/owner/users">Users</a>
+		<a href="/owner/categories">Categories</a>
+		<a href="/owner/vehicles">Vehicles</a>
+		<a href="/owner/reviews">Reviews</a>
+		<a href="/owner/service-requests">Service Requests</a>
+		<a href="/owner/contact-messages">Contact Messages</a>
+	</div>
+</section>
+
+<section>
+	<h2>Recent Users</h2>
+	<% if (!recentUsers || recentUsers.length === 0) { %>
+		<p class="empty-state">No users were found.</p>
+	<% } else { %>
+		<div class="table-wrap">
+			<table class="data-table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Role</th>
+						<th>Joined</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% recentUsers.forEach((account) => { %>
+						<tr>
+							<td><%= account.display_name %></td>
+							<td><%= account.email %></td>
+							<td><span class="chip"><%= account.role_name %></span></td>
+							<td><%= new Date(account.created_at).toLocaleDateString() %></td>
+						</tr>
+					<% }) %>
+				</tbody>
+			</table>
+		</div>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Categories</h2>
+	<% if (!recentCategories || recentCategories.length === 0) { %>
+		<p class="empty-state">No categories were found.</p>
+	<% } else { %>
+		<ul class="compact-list">
+			<% recentCategories.forEach((category) => { %>
+				<li><strong><%= category.name %></strong> - <%= category.vehicle_count %> vehicle(s)</li>
+			<% }) %>
+		</ul>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Vehicles</h2>
+	<% if (!recentVehicles || recentVehicles.length === 0) { %>
+		<p class="empty-state">No vehicles were found.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% recentVehicles.forEach((vehicle) => { %>
+				<article>
+					<h3><a href="/owner/vehicles/<%= vehicle.id %>/edit"><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></a></h3>
+					<p><%= vehicle.category_name || 'Uncategorized' %> - <%= vehicle.image_url ? 'Has image' : 'No image yet' %></p>
+					<p>$<%= Number(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> - <%= vehicle.is_available ? 'Available' : 'Sold' %></p>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Reviews</h2>
+	<% if (!recentReviews || recentReviews.length === 0) { %>
+		<p class="empty-state">No reviews were found.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% recentReviews.forEach((review) => { %>
+				<article>
+					<h3><a href="/vehicles/<%= review.vehicle_id %>"><%= review.year %> <%= review.make %> <%= review.model %></a></h3>
+					<p><strong><%= review.display_name || 'Anonymous' %></strong> rated it <%= review.rating %>/5</p>
+					<p><%= review.status %></p>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Service Requests</h2>
+	<% if (!recentRequests || recentRequests.length === 0) { %>
+		<p class="empty-state">No service requests were found.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% recentRequests.forEach((serviceRequest) => { %>
+				<article>
+					<h3><a href="/staff/service-requests/<%= serviceRequest.id %>"><%= serviceRequest.year %> <%= serviceRequest.make %> <%= serviceRequest.model %></a></h3>
+					<p><%= serviceRequest.display_name || 'Unknown customer' %> - <%= serviceRequest.service_type %></p>
+					<p><%= serviceRequest.status %></p>
+					<p class="muted"><%= serviceRequest.latest_note || 'No internal note yet.' %></p>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Contact Messages</h2>
+	<% if (!recentMessages || recentMessages.length === 0) { %>
+		<p class="empty-state">No contact messages were found.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% recentMessages.forEach((message) => { %>
+				<article>
+					<h3><%= message.name %></h3>
+					<p><%= message.email %> - <%= message.status %></p>
+					<p><%= message.message %></p>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

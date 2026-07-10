@@ -8,7 +8,7 @@ function renderForm(res, view, values) {
 
 function getLandingPath(role) {
 	if (role === 'secondary' || role === 'owner') {
-		return '/staff';
+		return role === 'owner' ? '/owner' : '/staff';
 	}
 
 	return '/dashboard';

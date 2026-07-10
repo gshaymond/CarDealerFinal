@@ -1,0 +1,63 @@
+<%- include('../partials/header', { title: title || 'Vehicle Inventory', user }) %>
+
+<h1><%= title || 'Vehicle Inventory' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<section>
+	<h2>Inventory Controls</h2>
+	<div class="stack-actions">
+		<a href="/owner/vehicles/new">Add Vehicle</a>
+		<a href="/owner/categories">Manage Categories</a>
+	</div>
+</section>
+
+<section>
+	<h2>Vehicles</h2>
+	<% if (!vehicles || vehicles.length === 0) { %>
+		<p class="empty-state">No vehicles were found.</p>
+	<% } else { %>
+		<div class="table-wrap">
+			<table class="data-table">
+				<thead>
+					<tr>
+						<th>Vehicle</th>
+						<th>Category</th>
+						<th>Price</th>
+						<th>Status</th>
+						<th>Images</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% vehicles.forEach((vehicle) => { %>
+						<tr>
+							<td>
+								<strong><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></strong>
+								<% if (vehicle.image_url) { %>
+									<div class="muted">Primary image attached</div>
+								<% } %>
+							</td>
+							<td><%= vehicle.category_name || 'Uncategorized' %></td>
+							<td>$<%= Number(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></td>
+							<td><span class="chip"><%= vehicle.is_available ? 'Available' : 'Sold' %></span></td>
+							<td><%= vehicle.image_count %></td>
+							<td>
+								<div class="stack-actions">
+									<a href="/owner/vehicles/<%= vehicle.id %>/edit">Edit</a>
+									<form method="POST" action="/owner/vehicles/<%= vehicle.id %>/delete" onsubmit="return confirm('Delete this vehicle? This will also remove related reviews and images.');">
+										<button type="submit">Delete</button>
+									</form>
+								</div>
+							</td>
+						</tr>
+					<% }) %>
+				</tbody>
+			</table>
+		</div>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

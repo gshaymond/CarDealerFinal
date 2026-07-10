@@ -1,0 +1,23 @@
+<%- include('../partials/header', { title: title || 'All Service Requests', user }) %>
+
+<h1><%= title || 'All Service Requests' %></h1>
+
+<section>
+	<h2>Request Queue</h2>
+	<% if (!serviceRequests || serviceRequests.length === 0) { %>
+		<p class="empty-state">No service requests were found.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% serviceRequests.forEach((serviceRequest) => { %>
+				<article>
+					<h3><a href="/staff/service-requests/<%= serviceRequest.id %>"><%= serviceRequest.year %> <%= serviceRequest.make %> <%= serviceRequest.model %></a></h3>
+					<p><%= serviceRequest.display_name || 'Unknown customer' %> - <%= serviceRequest.service_type %></p>
+					<p><%= serviceRequest.status %> - <%= serviceRequest.history_count %> history entries</p>
+					<p><%= serviceRequest.notes %></p>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

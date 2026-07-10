@@ -1,0 +1,23 @@
+<%- include('../partials/header', { title: title || 'Contact Messages', user }) %>
+
+<h1><%= title || 'Contact Messages' %></h1>
+
+<section>
+	<h2>Message Inbox</h2>
+	<% if (!contactMessages || contactMessages.length === 0) { %>
+		<p class="empty-state">No contact messages were found.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% contactMessages.forEach((message) => { %>
+				<article>
+					<h3><%= message.name %></h3>
+					<p><%= message.email %> - <%= message.status %></p>
+					<p><%= message.message %></p>
+					<p class="muted"><%= message.staff_note || 'No staff note yet.' %></p>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

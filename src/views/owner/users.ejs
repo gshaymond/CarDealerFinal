@@ -1,0 +1,47 @@
+<%- include('../partials/header', { title: title || 'User Management', user }) %>
+
+<h1><%= title || 'User Management' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<section>
+	<h2>All Users</h2>
+	<div class="table-wrap">
+		<table class="data-table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Current Role</th>
+					<th>Change Role</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% users.forEach((account) => { %>
+					<tr>
+						<td><%= account.display_name %></td>
+						<td><%= account.email %></td>
+						<td><span class="chip"><%= account.role_name %></span></td>
+						<td>
+							<form class="inline-form" method="POST" action="/owner/users/<%= account.id %>/role">
+								<label>
+									<span class="muted">Role</span>
+									<select name="roleId">
+										<% roles.forEach((role) => { %>
+											<option value="<%= role.id %>" <%= role.id === account.role_id ? 'selected' : '' %>><%= role.name %></option>
+										<% }) %>
+									</select>
+								</label>
+								<button type="submit">Update</button>
+							</form>
+						</td>
+					</tr>
+				<% }) %>
+			</tbody>
+		</table>
+	</div>
+</section>
+
+<%- include('../partials/footer') %>

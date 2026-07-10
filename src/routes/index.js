@@ -1,5 +1,5 @@
 import express from 'express';
-import { requireAuth, requireRole } from '../middleware/auth.js';
+import { requireAuth } from '../middleware/auth.js';
 import { getInventory, getVehicle } from '../controllers/vehicleController.js';
 import {
   createReview,
@@ -8,6 +8,7 @@ import {
   getDashboard,
 } from '../controllers/customerController.js';
 import staffRoutes from './staff.js';
+import ownerRoutes from './owner.js';
 
 const router = express.Router();
 
@@ -37,6 +38,6 @@ router.post('/reviews/:id/delete', requireAuth, deleteReview);
 router.post('/vehicles/:id/service-requests', requireAuth, createServiceRequest);
 
 // GET /admin - Admin page (requires authentication and admin role)
-router.get('/owner', requireAuth, requireRole('owner'), getDashboard);
+router.use('/owner', ownerRoutes);
 
 export default router;

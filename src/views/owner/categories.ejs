@@ -1,0 +1,59 @@
+<%- include('../partials/header', { title: title || 'Category Management', user }) %>
+
+<h1><%= title || 'Category Management' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<section>
+	<h2>Create Category</h2>
+	<% if (error) { %>
+		<p class="error-message"><%= error %></p>
+	<% } %>
+	<form method="POST" action="/owner/categories">
+		<label>
+			<span>Name</span>
+			<input type="text" name="name" value="<%= form.name || '' %>" required>
+		</label>
+		<button type="submit">Add Category</button>
+	</form>
+</section>
+
+<section>
+	<h2>Existing Categories</h2>
+	<div class="table-wrap">
+		<table class="data-table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Vehicles</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% categories.forEach((category) => { %>
+					<tr>
+						<td>
+							<form class="inline-form" method="POST" action="/owner/categories/<%= category.id %>">
+								<label>
+									<span class="muted">Category name</span>
+									<input type="text" name="name" value="<%= category.name %>" required>
+								</label>
+								<button type="submit">Save</button>
+							</form>
+						</td>
+						<td><%= category.vehicle_count %></td>
+						<td>
+							<form method="POST" action="/owner/categories/<%= category.id %>/delete" onsubmit="return confirm('Delete this category? Vehicles will become uncategorized.');">
+								<button type="submit">Delete</button>
+							</form>
+						</td>
+					</tr>
+				<% }) %>
+			</tbody>
+		</table>
+	</div>
+</section>
+
+<%- include('../partials/footer') %>

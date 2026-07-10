@@ -17,7 +17,12 @@
 
       <% if (user) { %>
         <% if (user.role === 'secondary' || user.role === 'owner') { %>
-          <a href="/staff">Staff Dashboard</a>
+          <% if (user.role === 'owner') { %>
+            <a href="/owner">Owner Dashboard</a>
+            <a href="/staff">Staff Dashboard</a>
+          <% } else { %>
+            <a href="/staff">Staff Dashboard</a>
+          <% } %>
         <% } else { %>
           <a href="/dashboard">Dashboard</a>
         <% } %>

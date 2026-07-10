@@ -1,0 +1,23 @@
+<%- include('../partials/header', { title: title || 'All Reviews', user }) %>
+
+<h1><%= title || 'All Reviews' %></h1>
+
+<section>
+	<h2>Review Log</h2>
+	<% if (!reviews || reviews.length === 0) { %>
+		<p class="empty-state">No reviews were found.</p>
+	<% } else { %>
+		<div class="compact-list">
+			<% reviews.forEach((review) => { %>
+				<article>
+					<h3><a href="/vehicles/<%= review.vehicle_id %>"><%= review.year %> <%= review.make %> <%= review.model %></a></h3>
+					<p><strong><%= review.display_name || 'Anonymous' %></strong> - <%= review.rating %>/5 - <%= review.status %></p>
+					<p><%= review.comment %></p>
+					<p class="muted"><%= review.last_action || 'No moderation action recorded.' %></p>
+				</article>
+			<% }) %>
+		</div>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>
