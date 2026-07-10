@@ -1,0 +1,35 @@
+<%- include('../partials/header', { title: title || 'Service Requests', user }) %>
+
+<h1><%= title || 'Service Requests' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<section>
+	<h2>Queue</h2>
+	<% if (!serviceRequests || serviceRequests.length === 0) { %>
+		<p>No service requests have been submitted yet.</p>
+	<% } else { %>
+		<% serviceRequests.forEach((serviceRequest) => { %>
+			<article>
+				<h3>
+					<a href="/staff/service-requests/<%= serviceRequest.id %>">
+						<% if (serviceRequest.vehicle_id) { %>
+							<%= serviceRequest.year %> <%= serviceRequest.make %> <%= serviceRequest.model %>
+						<% } else { %>
+							Vehicle removed
+						<% } %>
+					</a>
+				</h3>
+				<p><strong>Customer:</strong> <%= serviceRequest.display_name || 'Unknown' %></p>
+				<p><strong>Service type:</strong> <%= serviceRequest.service_type %></p>
+				<p><strong>Status:</strong> <%= serviceRequest.status %></p>
+				<p><strong>Submitted:</strong> <%= new Date(serviceRequest.created_at).toLocaleString() %></p>
+			</article>
+		<% }) %>
+	<% } %>
+	<p><a href="/staff">Back to staff dashboard</a></p>
+</section>
+
+<%- include('../partials/footer') %>

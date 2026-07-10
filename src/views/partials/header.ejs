@@ -4,15 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title || 'Turbo Car Deals' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-  <header>
-    <nav>
+<body class="app-shell">
+  <header class="site-header">
+    <nav class="site-nav">
       <a href="/">Home</a>
       <a href="/vehicles">Inventory</a>
 
       <% if (user) { %>
-        <a href="/dashboard">Dashboard</a>
+        <% if (user.role === 'secondary' || user.role === 'owner') { %>
+          <a href="/staff">Staff Dashboard</a>
+        <% } else { %>
+          <a href="/dashboard">Dashboard</a>
+        <% } %>
         <a href="/auth/logout">Logout</a>
       <% } else { %>
         <a href="/auth/login">Login</a>
@@ -21,4 +29,4 @@
     </nav>
   </header>
 
-  <main>
+  <main class="site-main">

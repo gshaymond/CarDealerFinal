@@ -6,6 +6,14 @@ function renderForm(res, view, values) {
 	return res.render(view, values);
 }
 
+function getLandingPath(role) {
+	if (role === 'secondary' || role === 'owner') {
+		return '/staff';
+	}
+
+	return '/dashboard';
+}
+
 // GET /auth/register
 // GET /auth/login
 // POST /auth/register
@@ -66,7 +74,7 @@ export async function register(req, res, next) {
 			role: roleResult.rows[0].name,
 		};
 
-		return res.redirect('/dashboard');
+		return res.redirect(getLandingPath(roleResult.rows[0].name));
 	} catch (error) {
 		return next(error);
 	}
@@ -112,7 +120,7 @@ export async function login(req, res, next) {
 			role: user.role,
 		};
 
-		return res.redirect('/dashboard');
+		return res.redirect(getLandingPath(user.role));
 	} catch (error) {
 		return next(error);
 	}

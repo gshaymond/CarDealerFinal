@@ -62,6 +62,7 @@ async function loadVehiclePage(vehicleId, userId = null) {
         FROM reviews r
         LEFT JOIN users u ON u.id = r.user_id
         WHERE r.vehicle_id = $1
+          AND r.status IN ('Pending', 'Approved')
         ORDER BY r.created_at DESC, r.id DESC
       `,
       [vehicleId]

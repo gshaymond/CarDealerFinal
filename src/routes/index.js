@@ -7,6 +7,7 @@ import {
   deleteReview,
   getDashboard,
 } from '../controllers/customerController.js';
+import staffRoutes from './staff.js';
 
 const router = express.Router();
 
@@ -23,6 +24,8 @@ router.get(['/vehicle/:id', '/vehicles/:id'], getVehicle);
 
 // GET /dashboard - Dashboard page (requires authentication)
 router.get('/dashboard', requireAuth, getDashboard);
+
+router.use('/staff', staffRoutes);
 
 // POST /vehicles/:id/reviews - Create or update the signed-in user's review
 router.post('/vehicles/:id/reviews', requireAuth, createReview);

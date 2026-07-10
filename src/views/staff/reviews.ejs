@@ -1,0 +1,38 @@
+<%- include('../partials/header', { title: title || 'Review Moderation', user }) %>
+
+<h1><%= title || 'Review Moderation' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<section>
+	<h2>All Reviews</h2>
+	<% if (!reviews || reviews.length === 0) { %>
+		<p>No reviews have been posted yet.</p>
+	<% } else { %>
+		<% reviews.forEach((review) => { %>
+			<article>
+				<h3>
+					<a href="/vehicles/<%= review.vehicle_id %>"><%= review.year %> <%= review.make %> <%= review.model %></a>
+				</h3>
+				<p><strong>Reviewer:</strong> <%= review.display_name || 'Anonymous' %></p>
+				<p><strong>Rating:</strong> <%= review.rating %>/5</p>
+				<p><strong>Status:</strong> <%= review.status %></p>
+				<p><strong>Last moderation action:</strong> <%= review.last_action || 'None' %></p>
+				<p><%= review.comment %></p>
+				<div>
+					<form method="post" action="/staff/reviews/<%= review.id %>/flag" style="display:inline;">
+						<button type="submit">Flag</button>
+					</form>
+					<form method="post" action="/staff/reviews/<%= review.id %>/remove" style="display:inline;">
+						<button type="submit">Remove</button>
+					</form>
+				</div>
+			</article>
+		<% }) %>
+	<% } %>
+	<p><a href="/staff">Back to staff dashboard</a></p>
+</section>
+
+<%- include('../partials/footer') %>

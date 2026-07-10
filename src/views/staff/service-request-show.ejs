@@ -1,0 +1,61 @@
+<%- include('../partials/header', { title: title || 'Service Request', user }) %>
+
+<h1><%= title || 'Service Request' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<% if (error) { %>
+	<p class="error-message"><%= error %></p>
+<% } %>
+
+<section>
+	<h2>Request Details</h2>
+	<p><strong>Customer:</strong> <%= serviceRequest.display_name || 'Unknown' %> (<%= serviceRequest.email || 'No email' %>)</p>
+	<p><strong>Vehicle:</strong> <%= serviceRequest.year %> <%= serviceRequest.make %> <%= serviceRequest.model %></p>
+	<p><strong>Service type:</strong> <%= serviceRequest.service_type %></p>
+	<p><strong>Current status:</strong> <%= serviceRequest.status %></p>
+	<p><strong>Submitted:</strong> <%= new Date(serviceRequest.created_at).toLocaleString() %></p>
+	<p><strong>Customer notes:</strong> <%= serviceRequest.notes %></p>
+	<p><strong>Internal notes:</strong> <%= serviceRequest.internal_notes || 'None yet.' %></p>
+
+	<form method="post" action="/staff/service-requests/<%= serviceRequest.id %>">
+		<label>
+			Status
+			<select name="status" required>
+				<% statusOptions.forEach((status) => { %>
+					<option value="<%= status %>" <%= (form.status || serviceRequest.status) === status ? 'selected' : '' %>><%= status %></option>
+				<% }) %>
+			</select>
+		</label>
+
+		<label>
+			Internal note
+			<textarea name="internalNote" rows="4"><%= form.internalNote || '' %></textarea>
+		</label>
+
+		<button type="submit">Update request</button>
+	</form>
+</section>
+
+<section>
+	<h2>Status History</h2>
+	<% if (!history || history.length === 0) { %>
+		<p>No status history is available yet.</p>
+	<% } else { %>
+		<ul>
+			<% history.forEach((entry) => { %>
+				<li>
+					<strong><%= entry.status %></strong> - <%= new Date(entry.created_at).toLocaleString() %>
+					<% if (entry.note) { %>
+						<span><%= entry.note %></span>
+					<% } %>
+				</li>
+			<% }) %>
+		</ul>
+	<% } %>
+	<p><a href="/staff/service-requests">Back to service requests</a></p>
+</section>
+
+<%- include('../partials/footer') %>

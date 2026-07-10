@@ -1,0 +1,40 @@
+<%- include('../partials/header', { title: title || 'Edit Vehicle', user }) %>
+
+<h1><%= title || 'Edit Vehicle' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<% if (error) { %>
+	<p class="error-message"><%= error %></p>
+<% } %>
+
+<section>
+	<h2><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></h2>
+	<p><strong>Category:</strong> <%= vehicle.category_name || 'Uncategorized' %></p>
+	<p><strong>Mileage:</strong> <%= Number(vehicle.mileage).toLocaleString('en-US') %></p>
+
+	<form method="post" action="/staff/vehicles/<%= vehicle.id %>">
+		<label>
+			Price
+			<input type="number" name="price" step="0.01" min="0" value="<%= form.price %>" required>
+		</label>
+
+		<label>
+			Description
+			<textarea name="description" rows="6"><%= form.description || '' %></textarea>
+		</label>
+
+		<label>
+			<input type="checkbox" name="isAvailable" value="true" <%= form.isAvailable ? 'checked' : '' %>>
+			Available for sale
+		</label>
+
+		<button type="submit">Save changes</button>
+	</form>
+
+	<p><a href="/staff">Back to staff dashboard</a></p>
+</section>
+
+<%- include('../partials/footer') %>

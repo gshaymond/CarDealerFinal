@@ -1,0 +1,106 @@
+<%- include('../partials/header', { title: title || 'Staff Dashboard', user }) %>
+
+<h1><%= title || 'Staff Dashboard' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<p>Signed in as <%= user.email %> (<%= user.role %>).</p>
+
+<section>
+	<h2>Summary</h2>
+	<div>
+		<p><strong>Available vehicles:</strong> <%= summary.available_vehicles %></p>
+		<p><strong>Items needing review:</strong> <%= summary.needs_review %></p>
+		<p><strong>Open service requests:</strong> <%= summary.open_requests %></p>
+		<p><strong>New contact messages:</strong> <%= summary.new_messages %></p>
+	</div>
+</section>
+
+<section>
+	<h2>Quick Links</h2>
+	<ul>
+		<li><a href="/staff/reviews">Review moderation</a></li>
+		<li><a href="/staff/service-requests">Service request queue</a></li>
+		<li><a href="/staff/contact-messages">Contact messages</a></li>
+	</ul>
+</section>
+
+<section>
+	<h2>Recent Vehicles</h2>
+	<% if (!recentVehicles || recentVehicles.length === 0) { %>
+		<p>No vehicles were found.</p>
+	<% } else { %>
+		<ul>
+			<% recentVehicles.forEach((vehicle) => { %>
+				<li>
+					<a href="/staff/vehicles/<%= vehicle.id %>/edit"><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></a>
+					- $<%= Number(vehicle.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+					- <%= vehicle.is_available ? 'Available' : 'Sold' %>
+				</li>
+			<% }) %>
+		</ul>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Reviews</h2>
+	<% if (!recentReviews || recentReviews.length === 0) { %>
+		<p>No reviews are waiting for moderation.</p>
+	<% } else { %>
+		<% recentReviews.forEach((review) => { %>
+			<article>
+				<h3>
+					<a href="/vehicles/<%= review.vehicle_id %>"><%= review.year %> <%= review.make %> <%= review.model %></a>
+				</h3>
+				<p><strong>Reviewer:</strong> <%= review.display_name || 'Anonymous' %></p>
+				<p><strong>Status:</strong> <%= review.status %></p>
+				<p><strong>Last action:</strong> <%= review.last_action || 'None' %></p>
+				<p><%= review.comment %></p>
+			</article>
+		<% }) %>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Service Requests</h2>
+	<% if (!recentRequests || recentRequests.length === 0) { %>
+		<p>No service requests have been submitted yet.</p>
+	<% } else { %>
+		<% recentRequests.forEach((serviceRequest) => { %>
+			<article>
+				<h3>
+					<% if (serviceRequest.vehicle_id) { %>
+						<a href="/staff/service-requests/<%= serviceRequest.id %>"><%= serviceRequest.year %> <%= serviceRequest.make %> <%= serviceRequest.model %></a>
+					<% } else { %>
+						<a href="/staff/service-requests/<%= serviceRequest.id %>">Vehicle removed</a>
+					<% } %>
+				</h3>
+				<p><strong>Customer:</strong> <%= serviceRequest.display_name || 'Unknown' %></p>
+				<p><strong>Service type:</strong> <%= serviceRequest.service_type %></p>
+				<p><strong>Status:</strong> <%= serviceRequest.status %></p>
+				<p><%= serviceRequest.internal_notes || 'No internal notes yet.' %></p>
+			</article>
+		<% }) %>
+	<% } %>
+</section>
+
+<section>
+	<h2>Recent Contact Messages</h2>
+	<% if (!recentMessages || recentMessages.length === 0) { %>
+		<p>No contact messages have been submitted yet.</p>
+	<% } else { %>
+		<% recentMessages.forEach((message) => { %>
+			<article>
+				<h3><%= message.name %></h3>
+				<p><strong>Email:</strong> <%= message.email %></p>
+				<p><strong>Status:</strong> <%= message.status %></p>
+				<p><%= message.message %></p>
+				<p><strong>Staff note:</strong> <%= message.staff_note || 'None yet.' %></p>
+			</article>
+		<% }) %>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

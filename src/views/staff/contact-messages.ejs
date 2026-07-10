@@ -1,0 +1,50 @@
+<%- include('../partials/header', { title: title || 'Contact Messages', user }) %>
+
+<h1><%= title || 'Contact Messages' %></h1>
+
+<% if (notice) { %>
+	<p class="notice"><%= notice %></p>
+<% } %>
+
+<% if (error) { %>
+	<p class="error-message"><%= error %></p>
+<% } %>
+
+<section>
+	<h2>Inbox</h2>
+	<% if (!contactMessages || contactMessages.length === 0) { %>
+		<p>No contact messages have been submitted yet.</p>
+	<% } else { %>
+		<% contactMessages.forEach((message) => { %>
+			<article>
+				<h3><%= message.name %></h3>
+				<p><strong>Email:</strong> <%= message.email %></p>
+				<p><strong>Status:</strong> <%= message.status %></p>
+				<p><strong>Submitted:</strong> <%= new Date(message.created_at).toLocaleString() %></p>
+				<p><%= message.message %></p>
+				<p><strong>Staff note:</strong> <%= message.staff_note || 'None yet.' %></p>
+
+				<form method="post" action="/staff/contact-messages/<%= message.id %>">
+					<label>
+						Status
+						<select name="status" required>
+							<% statusOptions.forEach((status) => { %>
+								<option value="<%= status %>" <%= message.status === status ? 'selected' : '' %>><%= status %></option>
+							<% }) %>
+						</select>
+					</label>
+
+					<label>
+						Staff note
+						<textarea name="staffNote" rows="3"><%= message.staff_note || '' %></textarea>
+					</label>
+
+					<button type="submit">Save update</button>
+				</form>
+			</article>
+		<% }) %>
+	<% } %>
+	<p><a href="/staff">Back to staff dashboard</a></p>
+</section>
+
+<%- include('../partials/footer') %>

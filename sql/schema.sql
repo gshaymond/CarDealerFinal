@@ -54,6 +54,7 @@ CREATE TABLE service_requests (
   vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE SET NULL,
   service_type TEXT NOT NULL,
   notes TEXT NOT NULL DEFAULT '',
+  internal_notes TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'Submitted',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -72,5 +73,17 @@ CREATE TABLE contact_messages (
   name TEXT NOT NULL,
   email TEXT NOT NULL,
   message TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'New',
+  staff_note TEXT NOT NULL DEFAULT '',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE review_moderation_actions (
+  id SERIAL PRIMARY KEY,
+  review_id INTEGER NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+  actor_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  action TEXT NOT NULL,
+  note TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -9,7 +9,7 @@
     <%- include('../partials/vehicle-card', { vehicle, linkToDetails: false, showDescription: false, thumbnailUrl: images.length > 0 ? images[0].image_url : null }) %>
 
     <% if (notice) { %>
-      <p><%= notice %></p>
+      <p class="notice"><%= notice %></p>
     <% } %>
 
     <% if (images.length > 0) { %>
@@ -38,7 +38,7 @@
           <h3><%= currentUserReview ? 'Update your review' : 'Leave a review' %></h3>
 
           <% if (reviewError) { %>
-            <p><%= reviewError %></p>
+            <p class="error-message"><%= reviewError %></p>
           <% } %>
 
           <form method="post" action="/vehicles/<%= vehicle.id %>/reviews">
@@ -95,7 +95,7 @@
         <p><a href="/auth/login">Log in</a> to submit a service request.</p>
       <% } else { %>
         <% if (serviceRequestError) { %>
-          <p><%= serviceRequestError %></p>
+          <p class="error-message"><%= serviceRequestError %></p>
         <% } %>
 
         <form method="post" action="/vehicles/<%= vehicle.id %>/service-requests">
