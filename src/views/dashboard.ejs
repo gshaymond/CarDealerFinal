@@ -8,6 +8,43 @@
 <p>You are signed in as <%= user.email %> (<%= user.role %>).</p>
 
 <section>
+	<h2>Request Service</h2>
+
+	<% if (serviceRequestError) { %>
+		<p class="error-message"><%= serviceRequestError %></p>
+	<% } %>
+
+	<form method="post" action="/dashboard/service-requests">
+		<label>
+			Vehicle
+			<select name="vehicleId" required>
+				<option value="">Choose a vehicle</option>
+				<% vehicles.forEach((vehicle) => { %>
+					<option value="<%= vehicle.id %>" <%= String(serviceRequestForm.vehicleId || '') === String(vehicle.id) ? 'selected' : '' %>><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></option>
+				<% }) %>
+			</select>
+		</label>
+
+		<label>
+			Service type
+			<select name="serviceType" required>
+				<option value="">Choose a service</option>
+				<% serviceTypes.forEach((serviceType) => { %>
+					<option value="<%= serviceType %>" <%= (serviceRequestForm.serviceType || '') === serviceType ? 'selected' : '' %>><%= serviceType %></option>
+				<% }) %>
+			</select>
+		</label>
+
+		<label>
+			Notes
+			<textarea name="notes" rows="4" required><%= serviceRequestForm.notes || '' %></textarea>
+		</label>
+
+		<button type="submit">Submit request</button>
+	</form>
+</section>
+
+<section>
 	<h2>My Service Requests</h2>
 
 	<% if (!serviceRequests || serviceRequests.length === 0) { %>

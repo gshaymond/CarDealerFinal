@@ -1,6 +1,6 @@
 import pool from '../db.js';
 
-async function fetchInventoryVehicles() {
+export async function fetchInventoryVehicles() {
 	const result = await pool.query(`
 		SELECT
 			v.id,

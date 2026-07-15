@@ -1,4 +1,5 @@
 import pool from '../db.js';
+import { fetchInventoryVehicles } from './vehicleController.js';
 
 const SERVICE_TYPES = ['Oil Change', 'Inspection', 'Maintenance', 'Repair', 'Detail', 'Other'];
 
@@ -97,88 +98,104 @@ function renderVehicleView(res, viewModel) {
   });
 }
 
+async function loadDashboardData(userId) {
+  const [serviceRequestsResult, serviceHistoryResult, reviewsResult, vehicles] = await Promise.all([
+    pool.query(
+      `
+        SELECT
+          sr.id,
+          sr.service_type,
+          sr.notes,
+          sr.status,
+          sr.created_at,
+          v.id AS vehicle_id,
+          v.year,
+          v.make,
+          v.model
+        FROM service_requests sr
+        LEFT JOIN vehicles v ON v.id = sr.vehicle_id
+        WHERE sr.user_id = $1
+        ORDER BY sr.created_at DESC, sr.id DESC
+      `,
+      [userId]
+    ),
+    pool.query(
+      `
+        SELECT
+          service_request_id,
+          status,
+          note,
+          created_at
+        FROM service_request_history
+        WHERE service_request_id IN (
+          SELECT id
+          FROM service_requests
+          WHERE user_id = $1
+        )
+        ORDER BY created_at ASC, id ASC
+      `,
+      [userId]
+    ),
+    pool.query(
+      `
+        SELECT
+          r.id,
+          r.vehicle_id,
+          r.rating,
+          r.comment,
+          r.status,
+          r.created_at,
+          v.year,
+          v.make,
+          v.model
+        FROM reviews r
+        LEFT JOIN vehicles v ON v.id = r.vehicle_id
+        WHERE r.user_id = $1
+        ORDER BY r.created_at DESC, r.id DESC
+      `,
+      [userId]
+    ),
+    fetchInventoryVehicles(),
+  ]);
+
+  const historyByRequestId = new Map();
+
+  for (const historyEntry of serviceHistoryResult.rows) {
+    if (!historyByRequestId.has(historyEntry.service_request_id)) {
+      historyByRequestId.set(historyEntry.service_request_id, []);
+    }
+
+    historyByRequestId.get(historyEntry.service_request_id).push(historyEntry);
+  }
+
+  return {
+    serviceRequests: serviceRequestsResult.rows.map((serviceRequest) => ({
+      ...serviceRequest,
+      history: historyByRequestId.get(serviceRequest.id) || [],
+    })),
+    reviews: reviewsResult.rows,
+    vehicles,
+  };
+}
+
+function renderDashboardView(res, viewModel) {
+  return res.render('dashboard', {
+    title: 'My Account',
+    serviceRequests: viewModel.serviceRequests || [],
+    reviews: viewModel.reviews || [],
+    vehicles: viewModel.vehicles || [],
+    serviceTypes: SERVICE_TYPES,
+    serviceRequestError: viewModel.serviceRequestError || null,
+    serviceRequestForm: viewModel.serviceRequestForm || {},
+  });
+}
+
 export async function getDashboard(req, res, next) {
   try {
     const userId = req.session.user.id;
+    const data = await loadDashboardData(userId);
 
-    const [serviceRequestsResult, serviceHistoryResult, reviewsResult] = await Promise.all([
-      pool.query(
-        `
-          SELECT
-            sr.id,
-            sr.service_type,
-            sr.notes,
-            sr.status,
-            sr.created_at,
-            v.id AS vehicle_id,
-            v.year,
-            v.make,
-            v.model
-          FROM service_requests sr
-          LEFT JOIN vehicles v ON v.id = sr.vehicle_id
-          WHERE sr.user_id = $1
-          ORDER BY sr.created_at DESC, sr.id DESC
-        `,
-        [userId]
-      ),
-      pool.query(
-        `
-          SELECT
-            service_request_id,
-            status,
-            note,
-            created_at
-          FROM service_request_history
-          WHERE service_request_id IN (
-            SELECT id
-            FROM service_requests
-            WHERE user_id = $1
-          )
-          ORDER BY created_at ASC, id ASC
-        `,
-        [userId]
-      ),
-      pool.query(
-        `
-          SELECT
-            r.id,
-            r.vehicle_id,
-            r.rating,
-            r.comment,
-            r.status,
-            r.created_at,
-            v.year,
-            v.make,
-            v.model
-          FROM reviews r
-          LEFT JOIN vehicles v ON v.id = r.vehicle_id
-          WHERE r.user_id = $1
-          ORDER BY r.created_at DESC, r.id DESC
-        `,
-        [userId]
-      ),
-    ]);
-
-    const historyByRequestId = new Map();
-
-    for (const historyEntry of serviceHistoryResult.rows) {
-      if (!historyByRequestId.has(historyEntry.service_request_id)) {
-        historyByRequestId.set(historyEntry.service_request_id, []);
-      }
-
-      historyByRequestId.get(historyEntry.service_request_id).push(historyEntry);
-    }
-
-    const serviceRequests = serviceRequestsResult.rows.map((serviceRequest) => ({
-      ...serviceRequest,
-      history: historyByRequestId.get(serviceRequest.id) || [],
-    }));
-
-    return res.render('dashboard', {
-      title: 'My Account',
-      serviceRequests,
-      reviews: reviewsResult.rows,
-    });
+    return renderDashboardView(res, data);
   } catch (error) {
     return next(error);
   }
@@ -223,19 +240,50 @@ export async function createReview(req, res, next) {
       });
     }
 
-    await pool.query(
-      `
-        INSERT INTO reviews (user_id, vehicle_id, rating, comment, status)
-        VALUES ($1, $2, $3, $4, 'Pending')
-        ON CONFLICT (user_id, vehicle_id)
-        DO UPDATE SET
-          rating = EXCLUDED.rating,
-          comment = EXCLUDED.comment,
-          status = 'Pending',
-          created_at = NOW()
-      `,
-      [userId, vehicleId, rating, comment]
-    );
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const existingReviewResult = await client.query(
+        `
+          SELECT id
+          FROM reviews
+          WHERE user_id = $1 AND vehicle_id = $2
+          LIMIT 1
+        `,
+        [userId, vehicleId]
+      );
+
+      if (existingReviewResult.rows.length > 0) {
+        await client.query(
+          `
+            UPDATE reviews
+            SET rating = $3,
+                comment = $4,
+                status = 'Pending',
+                created_at = NOW()
+            WHERE id = $1
+          `,
+          [existingReviewResult.rows[0].id, userId, rating, comment]
+        );
+      } else {
+        await client.query(
+          `
+            INSERT INTO reviews (user_id, vehicle_id, rating, comment, status)
+            VALUES ($1, $2, $3, $4, 'Pending')
+          `,
+          [userId, vehicleId, rating, comment]
+        );
+      }
+
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
 
     req.session.notice = 'Your review was saved and is waiting for moderation.';
     return res.redirect(`/vehicles/${vehicleId}`);
@@ -293,11 +341,21 @@ export async function deleteReview(req, res, next) {
 export async function createServiceRequest(req, res, next) {
   try {
     const userId = req.session.user.id;
-    const vehicleId = Number.parseInt(req.params.id, 10);
+    const isDashboardSubmission = req.path.includes('/dashboard');
+    const vehicleId = Number.parseInt(req.body.vehicleId || req.params.id, 10);
     const serviceType = normalizeServiceType(req.body.serviceType);
     const notes = normalizeText(req.body.notes);
+    const dashboardData = isDashboardSubmission ? await loadDashboardData(userId) : null;
 
     if (!Number.isInteger(vehicleId) || vehicleId <= 0) {
+      if (isDashboardSubmission) {
+        return renderDashboardView(res.status(400), {
+          ...dashboardData,
+          serviceRequestError: 'Choose a vehicle from the dashboard form.',
+          serviceRequestForm: { vehicleId: req.body.vehicleId, serviceType: req.body.serviceType, notes },
+        });
+      }
+
       return res.status(400).render('error', {
         title: 'Invalid Request',
         message: 'That service request link is not valid.',
@@ -307,6 +365,14 @@ export async function createServiceRequest(req, res, next) {
     const vehicle = await loadVehiclePage(vehicleId, userId);
 
     if (!vehicle) {
+      if (isDashboardSubmission) {
+        return renderDashboardView(res.status(404), {
+          ...dashboardData,
+          serviceRequestError: 'That vehicle could not be found.',
+          serviceRequestForm: { vehicleId: req.body.vehicleId, serviceType: req.body.serviceType, notes },
+        });
+      }
+
       return res.status(404).render('error', {
         title: 'Vehicle Not Found',
         message: 'No vehicle was found for that listing yet.',
@@ -314,6 +380,14 @@ export async function createServiceRequest(req, res, next) {
     }
 
     if (!serviceType) {
+      if (isDashboardSubmission) {
+        return renderDashboardView(res.status(400), {
+          ...dashboardData,
+          serviceRequestError: 'Choose a valid service type.',
+          serviceRequestForm: { vehicleId: req.body.vehicleId, serviceType: req.body.serviceType, notes },
+        });
+      }
+
       return renderVehicleView(res.status(400), {
         ...vehicle,
         serviceRequestError: 'Choose a valid service type.',
@@ -322,6 +396,14 @@ export async function createServiceRequest(req, res, next) {
     }
 
     if (!notes) {
+      if (isDashboardSubmission) {
+        return renderDashboardView(res.status(400), {
+          ...dashboardData,
+          serviceRequestError: 'Add a short description of the issue or service needed.',
+          serviceRequestForm: { vehicleId: req.body.vehicleId, serviceType: req.body.serviceType, notes },
+        });
+      }
+
       return renderVehicleView(res.status(400), {
         ...vehicle,
         serviceRequestError: 'Add a short description of the issue or service needed.',

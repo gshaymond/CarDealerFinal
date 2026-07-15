@@ -88,37 +88,6 @@
       <% } %>
     </section>
 
-    <section>
-      <h2>Request Service</h2>
-
-      <% if (!user) { %>
-        <p><a href="/auth/login">Log in</a> to submit a service request.</p>
-      <% } else { %>
-        <% if (serviceRequestError) { %>
-          <p class="error-message"><%= serviceRequestError %></p>
-        <% } %>
-
-        <form method="post" action="/vehicles/<%= vehicle.id %>/service-requests">
-          <label>
-            Service type
-            <select name="serviceType" required>
-              <option value="">Choose a service</option>
-              <% serviceTypes.forEach((serviceType) => { %>
-                <option value="<%= serviceType %>" <%= (serviceRequestForm.serviceType || '') === serviceType ? 'selected' : '' %>><%= serviceType %></option>
-              <% }) %>
-            </select>
-          </label>
-
-          <label>
-            Notes
-            <textarea name="notes" rows="4" required><%= serviceRequestForm.notes || '' %></textarea>
-          </label>
-
-          <button type="submit">Submit request</button>
-        </form>
-      <% } %>
-    </section>
-
     <p><a href="/vehicles">Back to inventory</a></p>
   </section>
 <% } %>

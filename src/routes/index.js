@@ -26,6 +26,9 @@ router.get(['/vehicle/:id', '/vehicles/:id'], getVehicle);
 // GET /dashboard - Dashboard page (requires authentication)
 router.get('/dashboard', requireAuth, getDashboard);
 
+// POST /dashboard/service-requests - Submit a service request from the dashboard
+router.post('/dashboard/service-requests', requireAuth, createServiceRequest);
+
 router.use('/staff', staffRoutes);
 
 // POST /vehicles/:id/reviews - Create or update the signed-in user's review
