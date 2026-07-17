@@ -2,10 +2,88 @@
 <h1>Inventory</h1>
 <p>Browse the vehicles we have available. This page is ready for database records and shows a clean empty state until inventory is added.</p>
 
+<section aria-label="Sort and filter inventory">
+  <form method="get" action="/vehicles" class="inline-form">
+    <label for="year" class="field">
+      Year
+      <select id="year" name="year">
+        <option value="">Any year</option>
+        <% (filterOptions?.years || []).forEach((yearOption) => { %>
+          <option value="<%= yearOption %>" <%= filterForm?.year === String(yearOption) ? 'selected' : '' %>><%= yearOption %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label for="model" class="field">
+      Brand / Make
+      <select id="make" name="make">
+        <option value="">Any brand</option>
+        <% (filterOptions?.makes || []).forEach((makeOption) => { %>
+          <option value="<%= makeOption %>" <%= filterForm?.make === makeOption ? 'selected' : '' %>><%= makeOption %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label for="model" class="field">
+      Model
+      <select id="model" name="model">
+        <option value="">Any model</option>
+        <% (filterOptions?.models || []).forEach((modelOption) => { %>
+          <option value="<%= modelOption %>" <%= filterForm?.model === modelOption ? 'selected' : '' %>><%= modelOption %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label for="priceMax" class="field">
+      Cost max
+      <select id="priceMax" name="priceMax">
+        <option value="">Any cost</option>
+        <% (filterOptions?.priceMaxValues || []).forEach((priceOption) => { %>
+          <% const formattedPrice = Number(priceOption).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); %>
+          <option value="<%= priceOption %>" <%= filterForm?.priceMax === String(priceOption) ? 'selected' : '' %>>Up to $<%= formattedPrice %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label for="mileageMax" class="field">
+      Mileage max
+      <select id="mileageMax" name="mileageMax">
+        <option value="">Any mileage</option>
+        <% (filterOptions?.mileageMaxValues || []).forEach((mileageOption) => { %>
+          <option value="<%= mileageOption %>" <%= filterForm?.mileageMax === String(mileageOption) ? 'selected' : '' %>>Up to <%= Number(mileageOption).toLocaleString('en-US') %> miles</option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label for="sort" class="field">
+      Sort by
+      <select id="sort" name="sort">
+        <option value="newest" <%= selectedSort === 'newest' ? 'selected' : '' %>>Newest first</option>
+        <option value="oldest" <%= selectedSort === 'oldest' ? 'selected' : '' %>>Oldest first</option>
+        <option value="price_asc" <%= selectedSort === 'price_asc' ? 'selected' : '' %>>Price: Low to high</option>
+        <option value="price_desc" <%= selectedSort === 'price_desc' ? 'selected' : '' %>>Price: High to low</option>
+        <option value="mileage_asc" <%= selectedSort === 'mileage_asc' ? 'selected' : '' %>>Mileage: Low to high</option>
+        <option value="mileage_desc" <%= selectedSort === 'mileage_desc' ? 'selected' : '' %>>Mileage: High to low</option>
+        <option value="year_desc" <%= selectedSort === 'year_desc' ? 'selected' : '' %>>Year: Newest first</option>
+        <option value="year_asc" <%= selectedSort === 'year_asc' ? 'selected' : '' %>>Year: Oldest first</option>
+      </select>
+    </label>
+
+    <button type="submit">Apply</button>
+    <a href="/vehicles">Clear</a>
+  </form>
+</section>
+
 <% if (vehicles.length === 0) { %>
   <section class="empty-state">
-    <h2>No vehicles yet</h2>
-    <p>Inventory will appear here once your database is connected and seeded.</p>
+    <% if (hasActiveFilters) { %>
+      <h2>No matching vehicles</h2>
+      <p>Try broadening your selected options or clearing filters to view all inventory.</p>
+      <p><a href="/vehicles">Clear filters</a></p>
+    <% } else { %>
+      <h2>No vehicles yet</h2>
+      <p>Inventory will appear here once your database is connected and seeded.</p>
+    <% } %>
     <p><a href="/">Return home</a></p>
   </section>
 <% } else { %>
