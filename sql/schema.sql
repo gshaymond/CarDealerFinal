@@ -30,13 +30,6 @@ CREATE TABLE vehicles (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE vehicle_images (
-  id SERIAL PRIMARY KEY,
-  vehicle_id INTEGER NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
-  image_url TEXT NOT NULL,
-  alt_text TEXT NOT NULL DEFAULT ''
-);
-
 CREATE TABLE reviews (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
